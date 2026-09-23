@@ -57,7 +57,40 @@ let cart=[];
 function money(n){return n.toLocaleString()}
 function renderProducts(){document.getElementById("products").innerHTML=products.map((p,i)=>`<div class="card"><img class="photo" src="${p.img}" alt="${p.name}"><h3>${p.name}</h3><div class="price">KSh ${money(p.price)}</div><div class="card-delivery"><strong>📍 Delivery Details</strong><label for="county-${i}">County</label><select id="county-${i}"><option value="">Select county</option><option>Baringo</option><option>Bomet</option><option>Bungoma</option><option>Busia</option><option>Elgeyo-Marakwet</option><option>Embu</option><option>Garissa</option><option>Homa Bay</option><option>Isiolo</option><option>Kajiado</option><option>Kakamega</option><option>Kericho</option><option>Kiambu</option><option>Kilifi</option><option>Kirinyaga</option><option>Kisii</option><option>Kisumu</option><option>Kitui</option><option>Kwale</option><option>Laikipia</option><option>Lamu</option><option>Machakos</option><option>Makueni</option><option>Mandera</option><option>Marsabit</option><option>Meru</option><option>Migori</option><option>Mombasa</option><option>Murang'a</option><option>Nairobi</option><option>Nakuru</option><option>Nandi</option><option>Narok</option><option>Nyamira</option><option>Nyandarua</option><option>Nyeri</option><option>Samburu</option><option>Siaya</option><option>Taita-Taveta</option><option>Tana River</option><option>Tharaka-Nithi</option><option>Trans Nzoia</option><option>Turkana</option><option>Uasin Gishu</option><option>Vihiga</option><option>Wajir</option><option>West Pokot</option></select><label for="town-${i}">Town / Area</label><input id="town-${i}" type="text" placeholder="e.g. Ruiru, Kimbo"><label for="address-${i}">Delivery Address</label><input id="address-${i}" type="text" placeholder="Building, street or estate"></div><button class="cartbtn" onclick="add(${i})">Add to Cart</button><button class="paynow" onclick="payForItem(${i})">💳 Pay Now</button><div class="payment-note">Enter your name & phone above → Add delivery details → Pay Now</div></div>`).join("") }
 function getCustomer(){let name=document.getElementById("customer-name").value.trim();let phone=document.getElementById("customer-phone").value.trim();if(!name){alert("Please enter your full name before paying.");document.getElementById("customer-name").focus();return null}if(!phone){alert("Please enter your phone number before paying.");document.getElementById("customer-phone").focus();return null}return {name,phone}}
-function payNow(){let customer=getCustomer();if(!customer)return;if(!cart.length){alert("Please add a product to your cart first, or use the Pay Now button under a product.");return}window.open(PAYWAVE_URL,"_blank")}
+function async function payNow(){
+  let customer=getCustomer();
+  if(!customer)return;
+
+  if(!cart.length){
+    alert("Please add a product to your cart first, or use the Pay Now button under a product.");
+    return;
+  }
+
+  const amount=cart.reduce((total,item)=>total+Number(item.price),0);
+
+  try{
+    const response=await fetch("/api/stkpush",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        phone:customer.phone,
+        amount:amount
+      })
+    });
+
+    const result=await response.json();
+
+    if(!response.ok){
+      alert(result.error || "M-Pesa payment could not be started.");
+      return;
+    }
+
+    alert(result.CustomerMessage || result.ResponseDescription || "M-Pesa payment prompt sent. Check your phone.");
+  }catch(error){
+    console.error(error);
+    alert("Unable to connect to M-Pesa. Please try again.");
+  }
+}
 function payForItem(i){let customer=getCustomer();if(!customer)return;let county=document.getElementById("county-"+i).value;let town=document.getElementById("town-"+i).value.trim();let address=document.getElementById("address-"+i).value.trim();if(!county){alert("Please select the delivery county for this item.");document.getElementById("county-"+i).focus();return}if(!town){alert("Please enter the town or area for this item.");document.getElementById("town-"+i).focus();return}if(!address){alert("Please enter the delivery address for this item.");document.getElementById("address-"+i).focus();return}if(!cart.some(p=>p.name===products[i].name && p.county===county && p.town===town && p.address===address)){cart.push({...products[i],county,town,address});renderCart()}window.open(PAYWAVE_URL,"_blank")}
 function add(i){let county=document.getElementById("county-"+i).value;let town=document.getElementById("town-"+i).value.trim();let address=document.getElementById("address-"+i).value.trim();if(!county){alert("Please select the delivery county for this item.");document.getElementById("county-"+i).focus();return}if(!town){alert("Please enter the town or area for this item.");document.getElementById("town-"+i).focus();return}if(!address){alert("Please enter the delivery address for this item.");document.getElementById("address-"+i).focus();return}cart.push({...products[i],county,town,address});renderCart()}
 function removeItem(i){cart.splice(i,1);renderCart()}
