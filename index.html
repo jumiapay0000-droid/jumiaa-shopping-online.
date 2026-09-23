@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jumiaa Shopping Online</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f6f8;color:#222}
+header{background:#0b8f3c;color:white;padding:18px 16px;text-align:center}header .logo{width:min(420px,92%);height:auto;display:block;margin:0 auto}header p{margin:10px 0 0;font-size:16px}
+.container{max-width:1100px;margin:auto;padding:18px}.hero,.cart,.payment{background:white;border-radius:14px;padding:18px;margin-bottom:18px}.hero{text-align:center}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.card{background:white;border-radius:14px;padding:12px;box-shadow:0 2px 10px #0001}
+.photo{width:100%;height:210px;object-fit:cover;border-radius:10px}.card h3{font-size:18px}.price{font-size:21px;font-weight:bold;color:#0b8f3c}
+button{border:0;border-radius:9px;padding:11px;font-weight:bold;cursor:pointer}.delivery-box{margin-top:16px;padding:14px;background:#f7f9fa;border-radius:10px}.delivery-box h3{margin-top:0}.delivery-box label{display:block;font-weight:bold;margin:10px 0 6px}.delivery-box select,.delivery-box input,.card-delivery select,.card-delivery input{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;font-size:16px;background:white}.card-delivery{margin-top:14px;padding:12px;background:#f7f9fa;border-radius:10px}.card-delivery label{display:block;font-weight:bold;margin:8px 0 5px}.card-delivery select,.card-delivery input{margin-bottom:4px}.cartbtn{background:#ffb300;width:100%;margin-top:8px}.paynow{background:#0b8f3c;color:white;width:100%;margin-top:8px}.checkout{background:#0b8f3c;color:white;width:100%}.payment-note{text-align:center;margin-top:8px;font-size:14px;color:#555}.customer-box{background:white;border-radius:14px;padding:18px;margin-bottom:18px}.customer-box label{display:block;font-weight:bold;margin:10px 0 6px}.customer-box input{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;font-size:16px}.required{color:#d00}
+.remove{float:right;padding:5px;background:#eee}.cartitem{padding:9px 0;border-bottom:1px solid #eee}.paybox{background:#eefaf1;padding:14px;border-radius:10px}
+footer{text-align:center;padding:25px;color:#666}
+</style></head>
+<body>
+<header>
+  <img src="logo.svg" alt="Jumiaa Shopping Online" class="logo">
+  <p>Quality electronics and home products</p>
+</header>
+<div class="container">
+<section class="hero"><h2>🛍️ Shop Our Products</h2><p>Select a product and add it to your cart.</p></section>
+<section class="customer-box"><h2>👤 Customer Details</h2><p>Please enter your details before paying.</p><label for="customer-name">Full Name <span class="required">*</span></label><input id="customer-name" type="text" placeholder="Enter your full name" autocomplete="name"><label for="customer-phone">Phone Number <span class="required">*</span></label><input id="customer-phone" type="tel" placeholder="e.g. 0715 117399" autocomplete="tel"></section>
+<section class="products" id="products"></section>
+<section class="cart"><h2>🛒 Your Cart</h2><div id="cartItems"><small>Your cart is empty.</small></div><h3>Total: KSh <span id="total">0</span></h3><button class="checkout" onclick="orderWhatsApp()">Order on WhatsApp</button><div class="payment-note">Your name and phone number are entered above. Delivery County, Town / Area and Address are selected under each product.</div></section>
+<section class="payment"><h2>💳 Pay for Your Order</h2><div class="paybox"><p><strong>Pay Now</strong> after entering your name, phone number and delivery details.</p><button class="paynow" onclick="payNow()">💳 Pay Now</button><p><strong>WhatsApp:</strong> +254 715 117399</p></div></section>
+</div>
+<footer>Jumiaa Shopping Online<br><small>WhatsApp: +254 715 117399</small></footer>
+<script>
+const PAYWAVE_URL="https://paywavexpress.co.ke/pay/jumia-nasdec-agency-shop";
+const products=[
+{name:"Solar Full Kit – 300W",price:9499,img:"images/solar-kit.jpg"},
+{name:"Complete K-Gas 13kg + Cooker",price:14995,img:"images/cooker-gas.jpg"},
+{name:"Samsung Home Theater System 5.1",price:5000,img:"images/home-theater.jpg"},
+{name:"Skyworth 50-inch Google TV",price:19999,img:"images/50-inch-skyworth-tv.jpg"},
+{name:"4 Gas Burners + 2 Electric Ramtons Cooker",price:19999,img:"images/4-gas-2-electric-cooker.jpg"},
+{name:"Hisense 55-inch ULED 4K Google TV",price:28499,img:"images/55-inch-hisense-tv.jpg"},
+{name:"Haier 13kg Wash and Dry",price:18999,img:"images/haier-13kg-wash-dry.jpg"},
+{name:"3 Seater with Puff",price:9999,img:"images/3-seater-with-puff.jpg"},
+{name:"Nunix 150 Litres Chest Freezer",price:14999,img:"images/nunix-150l-freezer.jpg"},
+{name:"Ramtons RF/222 2 Door Fridge – 88 L",price:6250,img:"images/ramtons-rf222-88l-fridge.jpg"},
+{name:"Glass Coffee Table Set – 6 Stools",price:4000,img:"images/glass-coffee-table-set.jpg"},
+{name:"Vitron 55-inch Smart TV",price:23999,img:"images/vitron-55-tv.jpg"},
+{name:"95 Litres Chest Freezer",price:12995,img:"images/95l-chest-freezer.jpg"},
+{name:"Ramtons 3 Gas + 1 Electric Cooker",price:13000,img:"images/ramtons-3gas-1electric.jpg"},
+{name:"Hisense 50-inch UHD 4K TV",price:19995,img:"images/hisense-50-inch-uhd-tv.jpg"},
+{name:"Von 90 Litres Fridge",price:8500,img:"images/von-90l-fridge.jpg"},
+{name:"Ramtons 4 Gas Burners 50×50 Electric Oven",price:11995,img:"images/ramtons-4gas-50x50.jpg"},
+{name:"Hisense XPB75 7.5KG Twin-Tub Washing Machine",price:14995,img:"images/hisense-xpb75-7-5kg.jpg"},
+{name:"Bruhm 120L 2 Door Silver Fridge",price:17900,img:"images/bruhm-120l-2-door-fridge.jpg"},
+{name:"CTYC 32-inch Smart TV",price:7500,img:"images/ctyc-32-smart-tv.jpg"},
+{name:"Skyworth 43-inch Android 10 4K UHD TV",price:16000,img:"images/skyworth-43-inch-4k-tv.jpg"},
+{name:"Hisense 43-inch Google TV",price:14000,img:"images/hisense-43-inch-google-tv.jpg"},
+{name:"4 Burner Gas Cooker",price:5000,img:"images/4-burner-gas-cooker-5000.jpg"},
+{name:"Von Hotpoint 138 Litres Double Door Fridge",price:15858,img:"images/von-hotpoint-138l-double-door-fridge.jpg"}];
+let cart=[];
+function money(n){return n.toLocaleString()}
+function renderProducts(){document.getElementById("products").innerHTML=products.map((p,i)=>`<div class="card"><img class="photo" src="${p.img}" alt="${p.name}"><h3>${p.name}</h3><div class="price">KSh ${money(p.price)}</div><div class="card-delivery"><strong>📍 Delivery Details</strong><label for="county-${i}">County</label><select id="county-${i}"><option value="">Select county</option><option>Baringo</option><option>Bomet</option><option>Bungoma</option><option>Busia</option><option>Elgeyo-Marakwet</option><option>Embu</option><option>Garissa</option><option>Homa Bay</option><option>Isiolo</option><option>Kajiado</option><option>Kakamega</option><option>Kericho</option><option>Kiambu</option><option>Kilifi</option><option>Kirinyaga</option><option>Kisii</option><option>Kisumu</option><option>Kitui</option><option>Kwale</option><option>Laikipia</option><option>Lamu</option><option>Machakos</option><option>Makueni</option><option>Mandera</option><option>Marsabit</option><option>Meru</option><option>Migori</option><option>Mombasa</option><option>Murang'a</option><option>Nairobi</option><option>Nakuru</option><option>Nandi</option><option>Narok</option><option>Nyamira</option><option>Nyandarua</option><option>Nyeri</option><option>Samburu</option><option>Siaya</option><option>Taita-Taveta</option><option>Tana River</option><option>Tharaka-Nithi</option><option>Trans Nzoia</option><option>Turkana</option><option>Uasin Gishu</option><option>Vihiga</option><option>Wajir</option><option>West Pokot</option></select><label for="town-${i}">Town / Area</label><input id="town-${i}" type="text" placeholder="e.g. Ruiru, Kimbo"><label for="address-${i}">Delivery Address</label><input id="address-${i}" type="text" placeholder="Building, street or estate"></div><button class="cartbtn" onclick="add(${i})">Add to Cart</button><button class="paynow" onclick="payForItem(${i})">💳 Pay Now</button><div class="payment-note">Enter your name & phone above → Add delivery details → Pay Now</div></div>`).join("") }
+function getCustomer(){let name=document.getElementById("customer-name").value.trim();let phone=document.getElementById("customer-phone").value.trim();if(!name){alert("Please enter your full name before paying.");document.getElementById("customer-name").focus();return null}if(!phone){alert("Please enter your phone number before paying.");document.getElementById("customer-phone").focus();return null}return {name,phone}}
+function payNow(){let customer=getCustomer();if(!customer)return;if(!cart.length){alert("Please add a product to your cart first, or use the Pay Now button under a product.");return}window.open(PAYWAVE_URL,"_blank")}
+function payForItem(i){let customer=getCustomer();if(!customer)return;let county=document.getElementById("county-"+i).value;let town=document.getElementById("town-"+i).value.trim();let address=document.getElementById("address-"+i).value.trim();if(!county){alert("Please select the delivery county for this item.");document.getElementById("county-"+i).focus();return}if(!town){alert("Please enter the town or area for this item.");document.getElementById("town-"+i).focus();return}if(!address){alert("Please enter the delivery address for this item.");document.getElementById("address-"+i).focus();return}if(!cart.some(p=>p.name===products[i].name && p.county===county && p.town===town && p.address===address)){cart.push({...products[i],county,town,address});renderCart()}window.open(PAYWAVE_URL,"_blank")}
+function add(i){let county=document.getElementById("county-"+i).value;let town=document.getElementById("town-"+i).value.trim();let address=document.getElementById("address-"+i).value.trim();if(!county){alert("Please select the delivery county for this item.");document.getElementById("county-"+i).focus();return}if(!town){alert("Please enter the town or area for this item.");document.getElementById("town-"+i).focus();return}if(!address){alert("Please enter the delivery address for this item.");document.getElementById("address-"+i).focus();return}cart.push({...products[i],county,town,address});renderCart()}
+function removeItem(i){cart.splice(i,1);renderCart()}
+function renderCart(){document.getElementById("cartItems").innerHTML=cart.length?cart.map((p,i)=>`<div class="cartitem"><strong>${p.name}</strong> — KSh ${money(p.price)}<br><small>📍 ${p.county} • ${p.town} • ${p.address}</small><button class="remove" onclick="removeItem(${i})">Remove</button></div>`).join(""):"<small>Your cart is empty.</small>";document.getElementById("total").textContent=money(cart.reduce((s,p)=>s+p.price,0))}
+function orderWhatsApp(){let customer=getCustomer();if(!customer)return;if(!cart.length){alert("Please add a product first.");return}let list=cart.map(p=>"- "+p.name+" — KSh "+money(p.price)+"\n  Delivery: "+p.county+", "+p.town+"\n  Address: "+p.address).join("\n");let msg=encodeURIComponent("Hello Jumiaa Shopping Online, I would like to order:\nCustomer Name: "+customer.name+"\nPhone: "+customer.phone+"\n\n"+list+"\nTotal: KSh "+money(cart.reduce((s,p)=>s+p.price,0))+"\n");window.open("https://wa.me/254715117399?text="+msg,"_blank")}
+renderProducts();renderCart();
+</script></body></html>
